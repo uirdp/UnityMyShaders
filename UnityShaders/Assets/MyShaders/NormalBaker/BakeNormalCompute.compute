@@ -1,0 +1,45 @@
+#pragma kernel CSMain
+
+RWTexture2D<float4> Result;
+
+Texture2D<float4> Input;
+SamplerState samplerInput;
+
+Texture2D<float4> NormalMap;
+SamplerState samplerNormalMap;
+
+int _TextureWidth;
+int _TextureHeight;
+float _Contrast;
+float4 _VertexToLight;
+
+inline float4 GammaCorrection(float4 LinearColor)
+{
+    return float4(pow(max(LinearColor.rgb, float3(0, 0, 0)), float3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2)), LinearColor.a);
+}
+
+inline float4 Constrast(float4 color, float contrast)
+{
+    return (color - 0.5) * contrast + 0.5;
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x >= _TextureWidth || id.y >= _TextureHeight)
+    {
+        return;
+    }
+
+    float2 uv = float2((float)id.x / _TextureWidth, (float)id.y / _TextureHeight);
+
+    float3 normal = NormalMap.SampleLevel(samplerNormalMap, uv, 0).xyz * 2.0 - 1.0;
+    float NdotL = max(0, dot(normalize(_VertexToLight).xyz,normal));
+
+    float4 color = Input.SampleLevel(samplerInput, uv, 0) * NdotL;
+
+    color = Constrast(color, _Contrast);
+    color = GammaCorrection(color);
+
+    Result[id.xy] = color;
+}
