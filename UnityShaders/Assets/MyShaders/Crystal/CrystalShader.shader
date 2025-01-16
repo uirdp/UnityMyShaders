@@ -97,11 +97,11 @@ Shader "Custom/CrystalShader"
                 float4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv); // <-
 
                 float rim = saturate(abs(dot(i.normal, float3(0, 1, 0))) * NdotV + 0.3);
-                col.a = saturate(_Alpha * rim);
+                col.a = saturate(_Alpha * pow(rim, 1.3));
                 
                 // apply fog
                 col.rgb = MixFog(col.rgb, i.fogFactor); // <-
-                col.rgb = _RimColor * (_RimPower * (1 - NdotV + 0.3));
+                col.rgb = _RimColor * (_RimPower * (1 - NdotV + 1.5));
                 return col;
             }
             ENDHLSL
