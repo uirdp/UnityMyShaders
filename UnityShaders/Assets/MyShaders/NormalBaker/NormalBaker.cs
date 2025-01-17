@@ -3,14 +3,11 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-// ランタイムに関係ないのでりかいしなくてOK！！！
-// SRPだとRTをTex2Dにするのにパスを書かないといけないっぽい・・・（めんどくさい）
-// BRPならそのままBlitとかSetRenderTargetとかでいけそう？
-
 namespace TextureUtility
 {
     public class NormalBaker : ScriptableRendererFeature
     {
+        #if UNITY_EDITOR
         #region editor
         [CustomEditor(typeof(NormalBaker))]
         public class NormalBakerEditor : Editor
@@ -27,6 +24,7 @@ namespace TextureUtility
             }
         }
         #endregion
+        #endif
         
         #region render pass
         class NormalBakerPass : ScriptableRenderPass
