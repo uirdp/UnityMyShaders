@@ -6,9 +6,8 @@ Shader "Custom/ErdTreeShader"
         _Color ("Color", Color) = (1, 1, 1, 1)
         _Alpha ("Alpha", Range(0, 5)) = 1
         _AlphaClip ("Alpha Clip", Range(-1, 1)) = 0
-        _RimPower ("Rim Power", Range(0, 10)) = 2.5
+        _RimPower ("Rim Power", Range(0, 64)) = 2.5
         _RimColor ("Rim Color", Color) = (1, 1, 1, 1)
-        _AlphaMax ("Alpha Max", Range(0, 5)) = 1
         _Brightness ("Brightness", Range(0, 5)) = 1
         [Header(Tint)]
         _Tint ("Tint", Color) = (1, 1, 1, 1)
@@ -98,17 +97,20 @@ Shader "Custom/ErdTreeShader"
             float4 frag (v2f i) : SV_Target
             {
                 float4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-                float avg = (col.r + col.g + col.b) / 3;
+                float avg = (col.r + col.g + col.b) / 3;        //　平均して色が黒に近いところは透明にする
                 col.a = step(_AlphaClip, avg) + _Alpha;
                 
                 half3 viewDir = normalize(GetWorldSpaceViewDir(i.posWS));
                 half3 normal = normalize(i.normal);
 
-                half rim = 1.9 - abs(dot(normal, viewDir));
+                half rim = 2.0f - abs(dot(normal, viewDir));
                 rim = pow(rim, _RimPower);
 
+                float4 outColor;
+                outColor.rgb = col.rgb * _Color.rgb * _Brightness * rim;
+                outColor.a = col.a;
                 
-                return col * _Color * _Brightness * rim;
+                return outColor;
             }
             ENDHLSL
         }
