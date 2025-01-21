@@ -1,2 +1,2 @@
 # UnityMyShaders
-Assets/MyShaderに書いたシェーダーを入れてきます（こんぴゅーとしぇーだー含む）
+Assets/MyShaderに趣味で書いたシェーダーを入れてきます
